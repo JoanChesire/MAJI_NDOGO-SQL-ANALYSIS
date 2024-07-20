@@ -63,8 +63,136 @@ IN(
 SELECT
 *
 FROM
-visits,
+water_quality
 WHERE
-visit_count > 2;
+subjective_quality_score = 10 AND visit_count = 2;
 
+-- Investigate pollution issues:
+
+-- We recorded contamination/pollution data for all of the well sources
+
+SELECT
+*
+FROM
+well_pollution;
+
+-- Some of the wells are contaminated with biological contaminants, while others are polluted with an excess of heavy metals and other pollutants. Based on the results, each well was classified as: 
+
+-- Clean, Contaminated: Biological or Contaminated: Chemical. It is important to know this because wells that are polluted with bio- or other contaminants are not safe to drink.
+--  It looks like they recorded the source_id of each test, so we can link it to a source, at someplace in Maji Ndogo.
+
+-- The well pollution table, the descriptions are notes taken by scientists as text, so it will be challenging to process it.
+-- The biological column is in units of CFU/mL, so it measures how much contamination is in the water. 0 is clean, and anything more than 0.01 is contaminated.
+-- Let's check the integrity of the data
+
+-- query that checks if the results is Clean but the biological column is > 0.01
+
+SELECT
+* 
+FROM
+well_pollution
+
+SELECT
+*
+FROM
+well_pollution
+WHERE
+results ='Clean' AND
+biological >0.01;
+
+-- It seems like we have some inconsistencies in how the well statuses are recorded
+-- The mistake stems from n the description field for determining the cleanliness of the water.
+
+-- In some cases, if the description field begins with the word “Clean”, the results have been classified as “Clean” in the results column, even thogh the biological column is > 0.01.
+
+--  let's look at the descriptions. We need to identify the records that mistakenly have the word Clean in the description.
+
+SELECT
+*
+FROM
+well_pollution
+WHERE
+description LIKE 'Clean_%' AND biological>0.01;
+
+-- The query has 38 wrong descriptions
+
+-- The results show two different descriptions that we need to fix:
+-- 1.Records that mistakenly have Clean Bacteria: E. coli should updated to Bacteria: E. coli
+-- 2.Records that mistakenly have Clean Bacteria: Giardia Lamblia should updated to Bacteria: Giardia Lamblia
+
+-- Case 1a: Update descriptions that mistakenly mention
+-- `Clean Bacteria: E. coli` to `Bacteria: E. coli`
+
+UPDATE
+well_pollution
+SET
+description ='Bacteria: E. coli'
+WHERE
+description = 'Clean Bacteria: E. coli';
+
+--  Case 1b: Update the descriptions that mistakenly mention
+-- `Clean Bacteria: Giardia Lamblia` to `Bacteria: Giardia Lamblia
+
+UPDATE
+well_pollution
+SET
+description = 'Bacteria: Giardia Lamblia'
+WHERE
+description ='Clean Bacteria: Giardia Lamblia';
+
+UPDATE
+well_pollution
+SET
+results = 'Contaminated: Biological'
+WHERE
+biological > 0.01 AND results = 'Clean';
+
+-- Test the changes on a copy of the table first.
+
+-- This method is especially useful for creating backup tables or subsets without the need for a separate CREATE TABLE and INSERT INTO statement
+
+CREATE TABLE
+md_water_services.well_pollution_copy
+AS(
+  SELECT
+  *
+  FROM
+  md_water_services.well_pollution
+);
+
+
+UPDATE
+well_pollution_copy
+SET
+description ='Bacteria: E. coli'
+WHERE
+description = 'Clean Bacteria: E. coli';
+UPDATE
+well_pollution_copy
+SET
+description = 'Bacteria: Giardia Lamblia'
+WHERE
+description ='Clean Bacteria: Giardia Lamblia';
+UPDATE
+well_pollution_copy
+SET
+results = 'Contaminated: Biological'
+WHERE
+biological > 0.01 AND results = 'Clean';
+
+--  Check if our errors are fixed using a SELECT query on the well_pollution_copy table:
+
+SELECT
+*
+FROM
+well_pollution_copy
+WHERE
+description LIKE "Clean_%"
+OR(results = "Clean"AND biological >0.01);
+
+-- There is No data
+--  Drop the table 
+
+DROP TABLE
+md_water_services.well_pollution_copy
 
