@@ -196,3 +196,43 @@ OR(results = "Clean"AND biological >0.01);
 DROP TABLE
 md_water_services.well_pollution_copy
 
+-- Clustering data to unveil Maji Ndogo's water crisis
+
+-- Cleaning our Data
+-- We add email addresses  in the format first_name.last_name@ndogowater.gov
+-- The procedure for adding email is as stipulated below 
+-- selecting the employee_name column
+-- replacing the space with a full stop
+-- make it lowercase
+-- and stitch it all together
+
+-- #1. Check the employee_name
+
+SELECT
+*
+FROM
+employee LIMIT 5;
+
+-- #2. Remove the space between the first and last names using REPLACE()
+-- #3 .use LOWER() with the result we just got 
+-- #4. CONCAT() to add the rest of the email address
+SELECT
+CONCAT(
+LOWER(REPLACE(employee_name,' ','.')),'@ndogowater.gov'
+)
+FROM
+employee;
+
+-- UPDATE the email column this time with the email addresses
+
+UPDATE
+employee
+SET email=CONCAT(
+LOWER(REPLACE(employee_name,' ','.')),'@ndogowater.gov'
+)
+
+-- Confirm that the email has been set
+SELECT
+*
+FROM
+employee LIMIT 5;
