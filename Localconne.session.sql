@@ -283,3 +283,36 @@ GROUP BY assigned_employee_id
 ORDER BY number_of_visits DESC
 LIMIT 3;
 
+-- Analysing Locations
+-- Looking at the location table, let’s focus on the province_name, town_name and location_type to understand where the water sources are in Maji Ndogo.
+
+-- Count the number of records per town
+
+SELECT
+town_name,
+COUNT(*) AS records_per_town
+FROM
+location
+GROUP BY town_name 
+ORDER BY records_per_town DESC;
+
+-- Count of records_per_province
+
+SELECT
+province_name,
+COUNT(*) AS records_per_province
+FROM
+location
+GROUP BY province_name
+ORDER BY records_per_province DESC;
+
+-- From this table it is clear that most of the water sources in the survey are situated in small rural communities.
+
+SELECT
+province_name,
+town_name,
+COUNT(*) AS  records_per_town
+FROM 
+location
+GROUP BY province_name,town_name
+ORDER BY province_name ASC, records_per_town DESC;
