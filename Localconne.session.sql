@@ -236,3 +236,50 @@ SELECT
 *
 FROM
 employee LIMIT 5;
+
+
+-- Often when databases are created and updated, or information is collected from different sources, errors creep in.
+-- The phone numbers in the phone_number column, the values are stored as strings.
+-- The phone numbers should be 12 characters long, consisting of the plus sign, area code (99)
+
+SELECT
+LENGTH(phone_number)
+FROM
+employee;
+
+-- The phone number has a trailing space at the end .
+-- USE TRIM(column) to remove any leading or trailing spaces and then update
+
+UPDATE employee
+SET phone_number = RTRIM(phone_number);
+
+SELECT
+LENGTH(phone_number)
+FROM
+employee;
+
+-- We used the RTRIM to remove trailing spaces the updated it thus the length of the phone number column is now 12
+
+-- Honouring the workers .
+-- Use the employee table to count how many of our employees live in each town. 
+
+SELECT 
+town_name,
+COUNT(employee_name)AS num_employees
+FROM
+employee
+GROUP BY town_name;
+
+-- top 3 field surveyors are to be honoured
+-- use the COUNT() to count the number of visits and GROUP BY assigned_employee_id then order be the number _of _visits creating in descending order to get the highest.
+
+
+SELECT
+assigned_employee_id,
+COUNT(visit_count) AS number_of_visits
+FROM
+visits
+GROUP BY assigned_employee_id
+ORDER BY number_of_visits DESC
+LIMIT 3;
+
