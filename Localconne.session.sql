@@ -316,3 +316,31 @@ FROM
 location
 GROUP BY province_name,town_name
 ORDER BY province_name ASC, records_per_town DESC;
+
+-- number of records for each location type
+
+SELECT
+location_type,
+COUNT(*) AS num_sources
+FROM
+location
+GROUP BY location_type
+ORDER BY num_sources;
+
+-- We can see that there are more rural sources than urban
+-- We will use percentages to make it more relatable
+
+SELECT
+23740/(15910 + 23740)*100
+
+
+-- Insights From the above area 
+--   1.Our entire country was properly canvassed, and our dataset represents the situation on the ground.
+--   2. 60% of our water sources are in rural communities across Maji Ndogo.
+
+-- Diving into the sources
+
+
+
+
+
