@@ -339,8 +339,40 @@ SELECT
 --   2. 60% of our water sources are in rural communities across Maji Ndogo.
 
 -- Diving into the sources
+SELECT
+* 
+FROM 
+water_source;
 
+-- The tabel shows we have access to different water source types and the number of people using each source
+-- The table will answer the following
+-- 1.  How many people did we survey in total?
 
+SELECT
+SUM(number_of_people_served) AS total_num_served
+FROM
+water_source;
 
+-- #276,628,140 people are served
 
+-- 2. How many wells, taps and rivers are there?
 
+SELECT
+type_of_water_source,
+COUNT(type_of_water_source)AS number_of_sources
+FROM
+water_source
+GROUP BY type_of_water_source
+ORDER BY number_of_sources DESC;
+
+-- The number of wells stand out at 17,383. 
+-- The results obtained will be useful to  understand how much all of these repairs will cost.
+
+-- 3.  How many people share particular types of water sources on average?
+SELECT
+type_of_water_source,
+Round(AVG(number_of_people_served),0 )AS ave_people_per_source
+FROM
+water_source
+GROUP BY type_of_water_source
+ORDER BY ave_people_per_source DESC;
