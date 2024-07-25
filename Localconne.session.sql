@@ -376,3 +376,34 @@ FROM
 water_source
 GROUP BY type_of_water_source
 ORDER BY ave_people_per_source DESC;
+
+
+-- These results are telling us that 644 people share a tap_in_home on average
+-- The surveyors combined the data of many households together and added this as a single tap record, but each household actually has its own tap
+-- In addition to this, there is an average of 6 people living in a home. So 6 people actually share 1 tap (not 644).
+
+-- Calculating the average number of people served by a single instance of each water source type helps us understand the typical capacity or load on a single water source.
+
+-- Calculate the total number of people served by each type of water source in total.
+
+SELECT
+  type_of_water_source,
+  SUM(number_of_people_served) AS population_served
+FROM
+  water_source
+GROUP BY
+  type_of_water_source
+ORDER BY population_served DESC;
+
+-- To make it a bit simpler to interpret, let's use percentages
+-- Total number of people served #276,628,140 
+
+SELECT
+type_of_water_source,
+(CAST(SUM(number_of_people_served)AS FLOAT)/276628140.0 * 100) AS percentage_people_per_source
+FROM
+water_source
+GROUP BY type_of_water_source
+ORDER BY percentage_people_per_source;
+
+
