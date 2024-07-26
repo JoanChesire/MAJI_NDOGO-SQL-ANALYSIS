@@ -399,11 +399,25 @@ ORDER BY population_served DESC;
 -- Total number of people served #276,628,140 
 
 SELECT
-type_of_water_source,
-(CAST(SUM(number_of_people_served)AS FLOAT)/276628140.0 * 100) AS percentage_people_per_source
+    type_of_water_source,
+    ROUND(SUM(number_of_people_served)/27628140 * 100, 0)  AS percentage_people_per_source
+FROM
+    water_source
+GROUP BY
+    type_of_water_source
+ORDER BY
+    percentage_people_per_source DESC;  
+
+-- we will have to fix or improve all of the infrastructure, so we should start thinking about how we can make a data-driven decision
+-- a simple approach is to fix the things that affect most people first. So let's write a query that ranks each type of source based on how many people in total use it. RANK() should tell you we are going to need a window function to do this, so let's think through the problem.
+
+SELECT
+type_of_water_source, 
+SUM(number_of_people_served) as number_of_people_served,
+RANK() OVER
+(ORDER BY SUM(number_of_people_served) DESC) AS Ranking
 FROM
 water_source
-GROUP BY type_of_water_source
-ORDER BY percentage_people_per_source;
-
-
+WHERE type_of_water_source != 'tap_in_home'
+GROUP BY
+type_of_water_source;
